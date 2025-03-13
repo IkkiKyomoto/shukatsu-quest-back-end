@@ -4,9 +4,9 @@ info:
   description: ユーザー、実績、ステージ、クエストを管理するためのAPI
   version: 1.0.0
 servers:
-  - url: /
+  - url: /functions/vi/
 paths:
-  /functions/vi/user/{userId}:
+  /user/{userId}:
     get:
       summary: ユーザー情報を取得
       parameters:
@@ -23,7 +23,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-  /functions/vi/user/{userId}/achievements:
+  /user/{userId}/achievements:
     get:
       summary: ユーザーの実績を取得
       parameters:
@@ -42,7 +42,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Achievement"
-  /functions/vi/stages:
+  /stages:
     get:
       summary: すべてのステージとそれらのクエストを取得
       responses:
@@ -54,7 +54,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/StageWithQuests"
-  /functions/vi/stages/{stageId}:
+  /stages/{stageId}:
     get:
       summary: 特定のステージとそれらのクエストを取得
       parameters:
@@ -71,7 +71,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StageWithQuests"
-  /functions/vi/quest/done/{questId}:
+  /user/{userId}/quest/{questId}:
     post:
       summary: クエストを完了としてマーク
       parameters:
@@ -84,7 +84,7 @@ paths:
       responses:
         "200":
           description: クエストが完了としてマークされました
-  /functions/vi/quest/es/done/{questId}:
+  /user/{userId}/quest/{questId}/es:
     post:
       summary: クエストのESを提出
       parameters:
@@ -99,14 +99,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ES"
+              $ref: "#/components/schemas/Es"
       responses:
         "201":
           description: ESが正常に提出されました
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ESResult"
+                $ref: "#/components/schemas/scoredEs"
 components:
   schemas:
     User:
@@ -128,6 +128,9 @@ components:
           type: string
           format: uuid
         quest_id:
+          type: string
+          format: uuid
+        stage_id:
           type: string
           format: uuid
         cleared_at:
@@ -152,6 +155,9 @@ components:
           format: uuid
         name:
           type: string
+        type:
+          type: string
+          description: クエストの種類
         number:
           type: integer
           description: クエストの順番
@@ -170,15 +176,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Quest"
-    ES:
+    Es:
       type: object
       properties:
-        user_id:
-          type: string
-          format: uuid
-        quest_id:
-          type: string
-          format: uuid
         theme:
           type: string
         answer:
@@ -186,7 +186,7 @@ components:
         length:
           type: integer
 
-    ESResult:
+    scoredEs:
       type: object
       properties:
         es_id:
