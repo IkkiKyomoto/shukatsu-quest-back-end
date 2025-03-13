@@ -1,0 +1,220 @@
+openapi: 3.0.0
+info:
+  title: Shukatsu QuestバックエンドAPI
+  description: ユーザー、実績、ステージ、クエストを管理するためのAPI
+  version: 1.0.0
+servers:
+  - url: /
+paths:
+  /functions/vi/user/{userId}:
+    get:
+      summary: ユーザー情報を取得
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: ユーザーデータが正常に取得されました
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /functions/vi/user/{userId}/achievements:
+    get:
+      summary: ユーザーの実績を取得
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 実績が正常に取得されました
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Achievement"
+  /functions/vi/stages:
+    get:
+      summary: すべてのステージとそれらのクエストを取得
+      responses:
+        "200":
+          description: ステージと関連するクエストが正常に取得されました
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StageWithQuests"
+  /functions/vi/stages/{stageId}:
+    get:
+      summary: 特定のステージとそれらのクエストを取得
+      parameters:
+        - name: stageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: ステージとそれらのクエストが正常に取得されました
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StageWithQuests"
+  /functions/vi/quest/done/{questId}:
+    post:
+      summary: クエストを完了としてマーク
+      parameters:
+        - name: questId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: クエストが完了としてマークされました
+  /functions/vi/quest/es/done/{questId}:
+    post:
+      summary: クエストのESを提出
+      parameters:
+        - name: questId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ES"
+      responses:
+        "201":
+          description: ESが正常に提出されました
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ESResult"
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        lv:
+          type: integer
+        exp:
+          type: integer
+        name:
+          type: string
+    Achievement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        quest_id:
+          type: string
+          format: uuid
+        cleared_at:
+          type: string
+          format: date-time
+    Stage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        number:
+          type: integer
+          description: ステージの順番
+    Quest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        number:
+          type: integer
+          description: クエストの順番
+    StageWithQuests:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        number:
+          type: integer
+          description: ステージの順番
+        quests:
+          type: array
+          items:
+            $ref: "#/components/schemas/Quest"
+    ES:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        quest_id:
+          type: string
+          format: uuid
+        theme:
+          type: string
+        answer:
+          type: string
+        length:
+          type: integer
+
+    ESResult:
+      type: object
+      properties:
+        es_id:
+          type: string
+          format: uuid
+        categories:
+          type: array
+          description: カテゴリごとの点数
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              score:
+                type: integer
+              full_score:
+                type: integer
+                description: そのカテゴリの満点
+              comment:
+                type: string
+        all_score:
+          type: integer
+        answer:
+          type: string
+          description: 提出されたES
+        correction:
+          type: string
+          description: 添削結果
+        correction_comment:
+          type: string
+          description: 添削コメント
