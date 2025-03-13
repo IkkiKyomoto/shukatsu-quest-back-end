@@ -27,6 +27,9 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const method = req.method;
     const userId = url.pathname.split("/").pop();
+    if (!userId) {
+        return handleError("User ID is required", 400);
+    }
 
     try {
         if (method === "GET") {
