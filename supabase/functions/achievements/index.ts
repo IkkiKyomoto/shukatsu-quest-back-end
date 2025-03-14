@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { handleError } from "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { handleError } from "../_shared/handleError.ts";
 
 const DATABASE_API_URL = Deno.env.get("DATABASE_API_URL");
 const DATABASE_API_KEY = Deno.env.get("DATABASE_API_KEY");
@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
         if (method === "GET") {
             // データベースからユーザーの実績を取得
             const { data, error } = await supabase.from("achievements").select(
-                "id, stages(stage_id), quest_id ,user_id, cleared_at",
+                "id, quests(stages(id)), quest_id ,user_id, cleared_at",
             ).order("cleared_at", { ascending: false }).eq("user_id", userId);
             if (error) {
                 return handleError(error.message, 500);
@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
                 return {
                     id: a.id,
                     user_id: a.user_id,
-                    stage_id: a.stages.stage_id,
+                    stage_id: a.quests.stages.id,
                     quest_id: a.quest_id,
                     cleared_at: a.cleared_at,
                 };
