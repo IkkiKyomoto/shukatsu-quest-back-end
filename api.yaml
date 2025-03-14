@@ -127,6 +127,9 @@ components:
         id:
           type: string
           format: uuid
+        user_id:
+          type: string
+          format: uuid
         quest_id:
           type: string
           format: uuid
