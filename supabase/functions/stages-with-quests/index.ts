@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
             // データベースからステージとクエストを取得
             const { data, error } = await supabase.from("stages").select(
                 "id, name, number, quests(id, name, number, base_exp, type)",
-            );
+            ).order("number");
             if (error) {
                 return handleError(error.message, 500);
             }

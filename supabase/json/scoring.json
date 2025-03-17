@@ -1,0 +1,29 @@
+{
+  "categories": [
+    {
+      "name": "論理性",
+      "description": "論理的に首尾一貫した内容になっているか",
+      "fullScore": 25
+    },
+    {
+      "name": "文章構成力",
+      "description": "わかりやすく適切な日本語表現が使われているか",
+      "fullScore": 25
+    },
+    {
+      "name": "具体性と説得力",
+      "description": "具体的な事例や根拠を示し、説得力があるか",
+      "fullScore": 25
+    },
+    {
+      "name": "熱意と意欲",
+      "description": "テーマに対して熱意や意欲が感じられるか",
+      "fullScore": 25
+    },
+    {
+      "name": "独自性",
+      "description": "他の人と差別化できる独自性があるか",
+      "fullScore": 25
+    }
+  ]
+}
