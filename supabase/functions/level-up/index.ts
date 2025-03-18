@@ -16,38 +16,30 @@ const supabase = createClient(DATABASE_API_URL, DATABASE_API_KEY);
 
 Deno.serve(async (req) => {
     const method = req.method;
-
+    const userId = new URL(req.url).pathname.split("/").pop();
+    const reqBody = await req.json();
+    const level: number = reqBody.level;
+    const exp: number = reqBody.exp;
     try {
-        if (method === "GET") {
+        if (method === "POST") {
             // データベースからステージとクエストを取得
-            const { data, error } = await supabase.from("stages").select(
-                "id, name, number, quests(id, name, number, base_exp, type)",
-            ).order("number");
+            const { data, error } = await supabase.from("users").update({
+                lv: level,
+                exp: exp,
+            }).eq("id", userId);
             if (error) {
                 return handleError(error.message, 500);
             }
-            // ステージとクエストを整形
-            if (data.length === 0) {
-                return new Response(
-                    JSON.stringify(
-                        [],
-                    ),
-                    { headers: { "Content-Type": "application/json" } },
-                );
-            }
-            // ステージをnumber順にソート
-            data.sort((a, b) => a.number - b.number);
-            // クエストをnumber順にソート
-            data.forEach((stage) => {
-                stage.quests.sort((a, b) => a.number - b.number);
-            });
             return new Response(
-                JSON.stringify(data),
+                JSON.stringify({
+                    message: "Success!",
+                }),
                 {
                     headers: {
                         ...corsHeaders,
                         "Content-Type": "application/json",
                     },
+                    status: 201,
                 },
             );
         } else {

@@ -3,6 +3,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { handleError } from "../_shared/handleError.ts";
 import Es from "../_class/es.ts";
 import { scoreEs } from "../_shared/scoreEs.ts";
+import { corsHeaders } from "../_const/cors.ts";
 
 const DATABASE_API_URL = Deno.env.get("DATABASE_API_URL");
 const DATABASE_API_KEY = Deno.env.get("DATABASE_API_KEY");
@@ -79,13 +80,29 @@ Deno.serve(async (req) => {
                         full_score: category.fullScore,
                     })),
                 );
+            const { data: __, error: questDoneError } = await supabase
+                .from("achievements")
+                .insert(
+                    {
+                        user_id: userId,
+                        quest_id: questId,
+                    },
+                );
+            if (questDoneError) {
+                return handleError(questDoneError.message, 500);
+            }
             if (categoriesError) {
                 return handleError(categoriesError.message, 500);
             }
 
             return new Response(
                 JSON.stringify(scoredEs),
-                { headers: { "Content-Type": "application/json" } },
+                {
+                    headers: {
+                        ...corsHeaders,
+                        "Content-Type": "application/json",
+                    },
+                },
             );
             // 採点済みのesを返す
         } else {
