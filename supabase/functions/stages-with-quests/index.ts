@@ -20,6 +20,8 @@ Deno.serve(async (req) => {
     try {
         if (method === "GET") {
             // データベースからステージとクエストを取得
+            // ステージとクエストをそれぞれのnumber順に取得
+
             const { data, error } = await supabase.from("stages").select(
                 "id, name, number, quests(id, name, number, base_exp, type)",
             ).order("number");
@@ -35,11 +37,12 @@ Deno.serve(async (req) => {
                     { headers: { "Content-Type": "application/json" } },
                 );
             }
-            // ステージをnumber順にソート
-            data.sort((a, b) => a.number - b.number);
             // クエストをnumber順にソート
-            data.forEach((stage) => {
-                stage.quests.sort((a, b) => a.number - b.number);
+            data.forEach((stage: { quests: any[] }) => {
+                stage.quests.sort((
+                    a: { number: number },
+                    b: { number: number },
+                ) => a.number - b.number);
             });
             return new Response(
                 JSON.stringify(data),
