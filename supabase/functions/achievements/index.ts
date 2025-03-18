@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { handleError } from "../_shared/handleError.ts";
+import { corsHeaders } from "../_const/cors.ts";
 
 const DATABASE_API_URL = Deno.env.get("DATABASE_API_URL");
 const DATABASE_API_KEY = Deno.env.get("DATABASE_API_KEY");
@@ -58,7 +59,12 @@ Deno.serve(async (req) => {
             });
             return new Response(
                 JSON.stringify(achievements),
-                { headers: { "Content-Type": "application/json" } },
+                {
+                    headers: {
+                        ...corsHeaders,
+                        "Content-Type": "application/json",
+                    },
+                },
             );
         } else {
             return handleError("Method not allowed", 405);

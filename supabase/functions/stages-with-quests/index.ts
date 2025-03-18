@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { handleError } from "../_shared/handleError.ts";
+import { corsHeaders } from "../_const/cors.ts";
 
 const DATABASE_API_URL = Deno.env.get("DATABASE_API_URL");
 const DATABASE_API_KEY = Deno.env.get("DATABASE_API_KEY");
@@ -21,7 +22,7 @@ Deno.serve(async (req) => {
             // データベースからステージとクエストを取得
             const { data, error } = await supabase.from("stages").select(
                 "id, name, number, quests(id, name, number, base_exp, type)",
-            );
+            ).order("number");
             if (error) {
                 return handleError(error.message, 500);
             }
@@ -34,9 +35,20 @@ Deno.serve(async (req) => {
                     { headers: { "Content-Type": "application/json" } },
                 );
             }
+            // ステージをnumber順にソート
+            data.sort((a, b) => a.number - b.number);
+            // クエストをnumber順にソート
+            data.forEach((stage) => {
+                stage.quests.sort((a, b) => a.number - b.number);
+            });
             return new Response(
                 JSON.stringify(data),
-                { headers: { "Content-Type": "application/json" } },
+                {
+                    headers: {
+                        ...corsHeaders,
+                        "Content-Type": "application/json",
+                    },
+                },
             );
         } else {
             return handleError("Method not allowed", 405);
